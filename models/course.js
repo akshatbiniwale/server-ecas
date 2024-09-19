@@ -1,26 +1,26 @@
 const mongoose = require("mongoose");
 
 const courseSchema = new mongoose.Schema({
-	name: {
+	name:{
 		type: String,
 		required: [true, "Name required"],
 	},
-	courseId: {
-		type: String,
-		required: [true, "CourseId required"],
-		minLength: [9, "Invalid CourseId"],
-		maxLength: [12, "Invalid CourseId"],
-	},
-	code: {
+	// courseId:{
+	// 	type: String,
+	// 	required: [true, "CourseId required"],
+	// 	minLength: [9, "Invalid CourseId"],
+	// 	maxLength: [12, "Invalid CourseId"],
+	// },
+	code:{
 		type: String,
 		required: [true, "CourseCode required"],
 		minLength: [5, "Invalid CourseCode"],
 	},
-	sem: {
+	semester:{
 		type: Number,
-		required: [true, "Sem required"],
+		required: [true, "Semester required"],
 	},
-	credit: {
+	credit:{
 		type: Number,
 		required: [true, "Credit required"],
 	},
@@ -35,10 +35,10 @@ const courseSchema = new mongoose.Schema({
 		ref: "Department",
 		required: [true, "Department Required"],
 	},
-	studentCount: {
-		type: Number,
-		required: [true, "Count required"],
-	},
+	createdAt:{
+		type:Date,
+		default:new Date(Date.now())
+	}
 });
 
 const Course = mongoose.model("Course", courseSchema);

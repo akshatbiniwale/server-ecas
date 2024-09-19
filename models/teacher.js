@@ -1,4 +1,5 @@
-const mongoose = require("mongoose");
+const mongoose = require("mongoose")
+const bcrypt = require("bcrypt")
 
 const teacherSchema = new mongoose.Schema({
 	name: {
@@ -8,11 +9,11 @@ const teacherSchema = new mongoose.Schema({
 	email: {
 		type: String,
 		required: [true, "Email required"],
+		unique:[true,"Email already exist"]
 	},
 	fid: {
 		type: String,
 		required: [true, "FID required"],
-		minLength: [10, "Invalid FID"],
 	},
 	password: {
 		type: String,
@@ -20,6 +21,7 @@ const teacherSchema = new mongoose.Schema({
 	},
 	phoneNumber: {
 		type: String,
+		maxLenght:[10,"Invalid phone number"]
 	},
 	department: {
 		type: mongoose.Schema.Types.ObjectId,
@@ -36,7 +38,16 @@ const teacherSchema = new mongoose.Schema({
 			ref: "Course",
 		},
 	],
+	role:{
+		type:String,
+		default:"teacher"
+	}
 });
+
+teacherSchema.pre("save",async function(){
+	const hashedPassword = await bcrypt.hash(this.password,10)
+	this.password = hashedPassword
+})
 
 const Teacher = mongoose.model("Teacher", teacherSchema);
 

@@ -10,12 +10,12 @@ const gradeSchema = new mongoose.Schema({
 		required: [true, "Grade Scored required"],
 		minLength: [2, "Invalid Grade Scored"],
 	},
-	studentUID: {
+	student: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "Student",
-		required: [true, "Student UID Required"],
+		required: [true, "Student Required"],
 	},
-	examId: {
+	examId:{
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "Exam",
 		required: [true, "Exam ID Required"],

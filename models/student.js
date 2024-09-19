@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt")
 
 const studentSchema = new mongoose.Schema({
 	name: {
@@ -8,16 +9,15 @@ const studentSchema = new mongoose.Schema({
 	email: {
 		type: String,
 		required: [true, "Email required"],
+		unique:[true,"Email already exist"]
 	},
 	uid: {
 		type: String,
 		required: [true, "UID required"],
 		minLength: [10, "Invalid UID"],
 	},
-	division: {
+	divison: {
 		type: String,
-		required: [true, "Division required"],
-		minLength: [1, "Invalid Division"],
 	},
 	password: {
 		type: String,
@@ -28,13 +28,29 @@ const studentSchema = new mongoose.Schema({
 	},
 	semester: {
 		type: Number,
+		default:1
 	},
 	department: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "Department",
 		required: [true, "Department Required"],
 	},
+	courses:[
+		{
+			type:mongoose.Schema.Types.ObjectId,
+			ref:"Course"
+		}
+	],
+	role:{
+		type:String,
+		default:"student"
+	}
 });
+
+studentSchema.pre("save", async function(){
+	const hashedPassword = await bcrypt.hash(this.password,10)
+	this.password = hashedPassword
+})
 
 const Student = mongoose.model("Student", studentSchema);
 
