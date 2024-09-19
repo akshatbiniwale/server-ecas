@@ -11,7 +11,7 @@ const examSchema = new mongoose.Schema({
 	exam_type: {
 		type: String,
 		required: [true, "Exam type required"],
-		minLength: [4, "Invalid Exam type"],
+		minLength: [3, "Invalid Exam type"],
 	},
 	course: {
 		type: mongoose.Schema.Types.ObjectId,
