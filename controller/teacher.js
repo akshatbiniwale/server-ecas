@@ -6,6 +6,7 @@ const bcrypt = require("bcrypt")
 const readCSV = require("../services/readCSV")
 const Student = require("../models/student")
 const Exam = require("../models/exam")
+const Grade = require("../models/grade")
 
 //Register
 exports.registerTeacher = async(req,res,next)=>{
@@ -80,10 +81,27 @@ exports.scheduleExam = async (req,res,next)=>{
 //Grade students using csv uploaded by teacher
 exports.gradeStudents = async (req,res,next)=>{
     try{
-        const courseId = req.params.course
-        const examId = req.params.examId
+        const {exam,course} = req.params.exam
         //read csv data
         const data = await readCSV(req.file.path)
+        // const promises = data.map(async(details)=>{
+        //     const {grade,status} = calculateGrade() //To be implemented
+        //     const {uid,marks,total} = details
+        //     const studentId = await Student.findOne({uid}).select("_id")
+        //     return Grade.create({
+        //         maxMarks:total,
+        //         marksScored:marks,
+        //         gradeScored:grade,
+        //         status:status,
+        //         exam:exam,
+        //         student:studentId,
+        //         course:course
+        //     })
+        // })
+        // await Promise.all(promises)
+        res.status(201).json({
+            success:true
+        })
     }catch(err){
         next(new ErrorHandler())
     }
