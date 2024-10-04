@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 
 const examSchema = new mongoose.Schema({
-	examId: {
-		type: String,
-	},
+	// examId: {
+	// 	type: String,
+	// },
 	hallId: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "ExamHall",

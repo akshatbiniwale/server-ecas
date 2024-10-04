@@ -44,6 +44,14 @@ const studentSchema = new mongoose.Schema({
 	role:{
 		type:String,
 		default:"student"
+	},
+	status:{
+		type:String,
+		default:"active"
+	},
+	createdAt:{
+		type:Date,
+		default: new Date(Date.now())
 	}
 });
 

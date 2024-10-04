@@ -15,10 +15,15 @@ const gradeSchema = new mongoose.Schema({
 		ref: "Student",
 		required: [true, "Student Required"],
 	},
-	examId:{
+	exam:{
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "Exam",
 		required: [true, "Exam ID Required"],
+	},
+	course:{
+		type: mongoose.Schema.Types.ObjectId,
+		ref: "Course",
+		required: [true, "Course ID Required"],
 	},
 	marksScored: {
 		type: Number,
@@ -29,6 +34,10 @@ const gradeSchema = new mongoose.Schema({
 		required: [true, "Status required"],
 		minLength: [4, "Invalid Status"],
 	},
+	createdAt:{
+		type:Date,
+		default: new Date(Date.now())
+	}
 });
 
 const Grade = mongoose.model("Grade", gradeSchema);

@@ -3,21 +3,7 @@ const Student = require("../models/student")
 const ErrorHandler = require("../services/ErrorHandler")
 const bcrypt = require("bcrypt")
 const sendJWT = require("../services/sendJWT")
-
-//Register
-exports.registerStudent = async(req,res,next)=>{
-    try{
-        /*
-            Validate spit email
-        */
-        const department = await Department.findOne({name:req.body.department})
-        const student = await Student.create({...req.body,department})
-        sendJWT(student,200,res,next)
-    }catch(err){
-        console.log(err)
-        next(new ErrorHandler())
-    }
-}
+const Course = require("../models/course")
 
 //Login
 exports.loginStudent= async(req,res,next)=>{
@@ -37,3 +23,24 @@ exports.loginStudent= async(req,res,next)=>{
         next(new ErrorHandler())
     }
 }
+
+//Get student course
+exports.getCourses = async(req,res,next)=>{
+    try{
+        const {semester} = req.params
+        const student = await Student.findOne({email:req.user}).select("courses").populate("courses")
+        res.status(200)
+        .json({
+            success:true,
+            courses:student.courses
+        })
+        
+    }catch(err){
+        console.log(err)
+        next(new ErrorHandler())
+    }
+}
+
+//Get student exam details
+
+
