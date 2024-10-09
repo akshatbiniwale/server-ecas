@@ -4,7 +4,7 @@ const upload = require("../middleware/multer");
 const router = express.Router();
 
 router.post("/department", createDepartment)
-router.post("/course", createCourse)
+router.post("/course", upload.single("file"),createCourse)
 
 //Register students to portal using csv
 router.post("/registerstudents", upload.single("file") ,registerStudents)

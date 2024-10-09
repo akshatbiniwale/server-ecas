@@ -8,4 +8,6 @@ router.post("/login",loginStudent)
 //Get student course
 router.get("/courses", authenticate, getCourses)
 
+//Get grade card
+
 module.exports = router
