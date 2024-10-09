@@ -20,7 +20,12 @@ const courseSchema = new mongoose.Schema({
 		type: Number,
 		required: [true, "Semester required"],
 	},
-	credit:{
+	category:{
+		type:String,
+		default:"Core"
+	}
+	,
+	credits:{
 		type: Number,
 		required: [true, "Credit required"],
 	},

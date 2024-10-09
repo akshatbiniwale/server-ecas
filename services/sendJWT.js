@@ -3,7 +3,7 @@ const ErrorHandler = require("./ErrorHandler")
 
 const sendJWT = (user,code,res,next)=>{
     try{
-        const token = jwt.sign({email:user.email},process.env.JWT_SECRET,{expiresIn:"12h"})
+        const token = jwt.sign({id:user._id},process.env.JWT_SECRET,{expiresIn:"12h"})
         const cookieOptions = {
             httpOnly:true,
             expire: new Date(Date.now()+12*3600000)

@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt")
 const readCSV = require("../services/readCSV")
 const Student = require("../models/student")
 const Exam = require("../models/exam")
-const Grade = require("../models/grade")
+const Mark = require("../models/mark")
 
 //Register
 exports.registerTeacher = async(req,res,next)=>{
@@ -27,6 +27,7 @@ exports.registerTeacher = async(req,res,next)=>{
 //Login
 exports.loginTeacher = async(req,res,next)=>{
     try{
+        console.log(req.body)
         const {email,password} = req.body
         const teacher = await Teacher.findOne({email})
         if(!teacher)
@@ -78,20 +79,19 @@ exports.scheduleExam = async (req,res,next)=>{
 }
 
 
-//Grade students using csv uploaded by teacher
-exports.gradeStudents = async (req,res,next)=>{
+//Generating marks of students using csv uploaded by teacher
+exports.uploadExamMarks = async (req,res,next)=>{
     try{
         const {exam,course} = req.params.exam
         //read csv data
         const data = await readCSV(req.file.path)
         // const promises = data.map(async(details)=>{
-        //     const {grade,status} = calculateGrade() //To be implemented
+        //  
         //     const {uid,marks,total} = details
         //     const studentId = await Student.findOne({uid}).select("_id")
-        //     return Grade.create({
+        //     return await Mark.create({
         //         maxMarks:total,
         //         marksScored:marks,
-        //         gradeScored:grade,
         //         status:status,
         //         exam:exam,
         //         student:studentId,
@@ -106,6 +106,11 @@ exports.gradeStudents = async (req,res,next)=>{
         next(new ErrorHandler())
     }
 }
+
+//Grade students --GET (Provide optimal SA value to teacher)
+
+
+//Grade students --POST (Mark using selected SA value)
 
 
 

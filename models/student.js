@@ -14,7 +14,6 @@ const studentSchema = new mongoose.Schema({
 	uid: {
 		type: String,
 		required: [true, "UID required"],
-		minLength: [10, "Invalid UID"],
 	},
 	divison: {
 		type: String,
