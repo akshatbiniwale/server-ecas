@@ -1,4 +1,7 @@
 const path = require("path")
+const axios = require("axios")
+const FormData = require('form-data')
+const fs = require("fs")
 const Course = require("../models/course")
 const Department = require("../models/department")
 const Student = require("../models/student")
@@ -108,11 +111,19 @@ exports.generateTimetable = async(req,res,next)=>{
             return data
         })
         //Converting json data to csv format and saving it in file
-        await jsonToCsv(path.join(__dirname,"..","uploads"),"courses_taken.csv",studentsData)
+        const FILEPATH = path.join(__dirname,"..","uploads","courses_taken.csv")
+        await jsonToCsv(FILEPATH,studentsData)
         /*
             Send above file to python server to generate timetable.
             Response will a file containing generated timetable
         */
+        const file = fs.createReadStream(FILEPATH)
+        const formData = new FormData()
+        formData.append("file", file)
+        const data = await axios.post("http://127.0.0.1:8000/generate_timetable",
+                                    formData,{
+                                        headers:{...formData.getHeaders()}
+                                    })
         res.status(200)
         .json({
             success:true
@@ -123,7 +134,6 @@ exports.generateTimetable = async(req,res,next)=>{
 }
 
 
-//Seat allocation
 
 
 
