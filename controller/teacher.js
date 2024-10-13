@@ -27,7 +27,6 @@ exports.registerTeacher = async(req,res,next)=>{
 //Login
 exports.loginTeacher = async(req,res,next)=>{
     try{
-        console.log(req.body)
         const {email,password} = req.body
         const teacher = await Teacher.findOne({email})
         if(!teacher)
