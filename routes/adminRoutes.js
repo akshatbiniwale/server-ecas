@@ -1,7 +1,5 @@
 const express = require("express");
 
-const { createDepartment, registerStudents, createCourse, generateTimetable, getCourses } = require("../controller/admin");
-
 const {
 	createDepartment,
 	registerStudents,
@@ -9,6 +7,8 @@ const {
 	generateTimetable,
 	registerAutoRooms,
 	registerManualRooms,
+	getRooms,
+	getCourses
 } = require("../controller/admin");
 
 const upload = require("../middleware/multer");
@@ -23,9 +23,10 @@ router.post("/registerstudents", upload.single("file"), registerStudents);
 //get courses
 router.get("/courses", getCourses)
 
-
+//Generating timetable
 router.post("/timetable/create", generateTimetable)
-// resgister rooms to portal using csv
+
+// create rooms to portal using csv
 router.post(
 	"/settings/create-auto-rooms",
 	upload.single("file"),
@@ -33,7 +34,9 @@ router.post(
 );
 router.post("/settings/manual-auto-rooms", registerManualRooms);
 
+//Get rooms
+router.get("/rooms", getRooms);
 
-router.post("/timetable/create", generateTimetable);
+
 
 module.exports = router;

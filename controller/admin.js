@@ -138,8 +138,11 @@ exports.getCourses = async(req,res,next)=>{
 //Generate timetable 
 exports.generateTimetable = async(req,res,next)=>{
     try{
-        const {semester,courses} = req.body
-        const students = await Student.find({semester,status:"active"})
+        console.log(req.body)
+        const {semester,year,courses,rooms,startDate,startTime} = req.body
+        const semesterNumber = 2*year-(semester.toLowerCase()==="odd")
+
+        const students = await Student.find({semester:semesterNumber,status:"active"})
                         .select("uid courses")
                         .populate({
                             path: "courses",
@@ -147,40 +150,7 @@ exports.generateTimetable = async(req,res,next)=>{
                         })
         //Finding out the courses taken by the students
         /*
-=======
-exports.registerStudents = async (req, res, next) => {
-	try {
-		const defaultPassword = req.body.password;
-		const data = await readCSV(req.file.path);
-		const departments = await Department.find({}).select("_id name");
-		data.forEach((student) => {
-			student.password = defaultPassword;
-			student.department = departments.find(
-				(dept) => dept.name === student.department
-			)._id;
-		});
-		console.log(data);
-		const students = await Student.insertMany(data);
-		res.status(201).json({
-			success: true,
-			data,
-		});
-	} catch (err) {
-		console.log(err.message);
-		next(new Error(501, err.message));
-	}
-};
 
-//Generate timetable
-exports.generateTimetable = async (req, res, next) => {
-	try {
-		const { semester, courses } = req.body;
-		const students = await Student.find({ semester, status: "active" })
-			.select("uid courses")
-			.populate({
-				path: "courses",
-				select: "_id name",
-			});
 		//Finding out the courses taken by the students
 		/*
             studentData format ---->
@@ -216,6 +186,10 @@ exports.generateTimetable = async (req, res, next) => {
 		const file = fs.createReadStream(FILEPATH);
 		const formData = new FormData();
 		formData.append("file", file);
+        formData.append("rooms", JSON.stringify(rooms))
+        formData.append("startDate",startDate)
+        formData.append("startTime",startTime)
+
 		const data = await axios.post(
 			"http://127.0.0.1:8000/generate_timetable",
 			formData,
@@ -236,17 +210,12 @@ exports.registerAutoRooms = async (req, res, next) => {
 	try {
 		const data = await readCSV(req.file.path);
 		data.forEach((hall) => {
-			hall.hallNumber = parseInt(hall.Rooms);
-			hall.exam = null;
-			hall.studentUID = [];
-			hall.invigilatorFID = null;
-			delete hall.Rooms;
+			hall.hallNumber = parseInt(hall.hallNumber);
 		});
-		console.log(data);
 		const room = await ExamHall.insertMany(data);
 		res.status(201).json({
 			success: true,
-			data,
+			rooms:data,
 		});
 	} catch (err) {
 		console.log(err.message);
@@ -258,15 +227,29 @@ exports.registerManualRooms = async (req, res, next) => {
 	try {
 		const room = req.body;
 		const data = {
-			hallNumber: parseInt(room.Rooms),
-			exam: null,
-			studentUID: [],
-			invigilatorFID: null,
+			hallNumber: parseInt(room.hallNumber),
 		};
-		console.log(data);
 		const newRoom = await ExamHall.create(data);
+        res.status(201).json({
+			success: true,
+			room:newRoom
+		});
 	} catch (err) {
 		console.log(err.message);
 		next(new ErrorHandler(500, err.message));
 	}
 };
+
+//Get rooms
+exports.getRooms = async(req,res,next)=>{
+    try{
+        const rooms = await ExamHall.find({})
+        res.status(200).json({
+            success:true,
+            rooms
+        })
+    }catch(err){
+        console.log(err.message);
+		next(new ErrorHandler(500, err.message))
+    }
+}
