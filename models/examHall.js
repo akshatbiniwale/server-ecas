@@ -5,22 +5,14 @@ const examHallSchema = new mongoose.Schema({
 		type: Number,
 		required: [true, "Exam hall number required"],
 	},
-	exam: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: "Exam",
+	capacity:{
+		type:Number,
+		default:30
 	},
-	studentUID: [
-		{
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "Student",
-			// required: [true, "UIDs Required"],
-		},
-	],
-	invigilatorFID: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: "Teacher",
-		// required: [true, "Please assign Invigilator"],
-	},
+	available:{
+		type:Boolean,
+		default:true
+	}
 });
 
 const ExamHall = mongoose.model("ExamHall", examHallSchema);
