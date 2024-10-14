@@ -81,6 +81,61 @@ exports.registerStudents = async (req,res,next)=>{
     }
 }
 
+
+//Get courses according to year and semester
+exports.getCourses = async(req,res,next)=>{
+    try{
+        const {year, semester} = req.query
+        const semesterNumber = 2*year-(semester.toLowerCase()==="odd")
+
+        // Get the date 6 months ago
+        const sixMonthsAgo = new Date();
+        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+        const courses = await Course.find({
+                                    semester:semesterNumber,
+                                    createdAt: {
+                                        $gte:sixMonthsAgo
+                                    }
+                                })
+                                .select("_id name category department")
+                                .populate({
+                                    path:"department",
+                                    select:"name"
+                                })
+
+        const departments = await Department.find({})
+        const categories = await Course.distinct("category")
+
+        //Classifying courses according to department and category
+        const classifiedCourses = {}
+		categories.forEach(category=>classifiedCourses[category] = category === 'Core' ? {} : [])
+
+		departments.forEach(department=>classifiedCourses['Core'][department.name]=[])
+
+        courses.forEach(course=>{
+			const category = course.category
+			const department = course.department.name
+			if(category==='Core') 
+				classifiedCourses[category][department].push(course)
+			else
+				classifiedCourses[category].push(course)
+		})
+
+
+        res.status(200).json({
+            success:true,
+            courses:classifiedCourses
+        })
+
+
+    }catch(err){
+        console.log(err.message)
+        next(new Error(500, err.message))
+    }
+}
+
+
+
 //Generate timetable 
 exports.generateTimetable = async(req,res,next)=>{
     try{
