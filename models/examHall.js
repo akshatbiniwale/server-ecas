@@ -13,13 +13,13 @@ const examHallSchema = new mongoose.Schema({
 		{
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "Student",
-			required: [true, "UIDs Required"],
+			// required: [true, "UIDs Required"],
 		},
 	],
 	invigilatorFID: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "Teacher",
-		required: [true, "Please assign Invigilator"],
+		// required: [true, "Please assign Invigilator"],
 	},
 });
 
