@@ -59,6 +59,95 @@ exports.createCourse = async (req, res, next) => {
 };
 
 //Register Students using uploaded csv
+exports.registerStudents = async (req,res,next)=>{
+    try{
+        const defaultPassword = req.body.password
+        const data = await readCSV(req.file.path)
+        const departments = await Department.find({}).select("_id name")
+        data.forEach(student=>{
+            student.password = defaultPassword
+            student.department = departments.find(dept=>dept.name===student.department)._id
+        })
+        console.log(data)
+        const students = await Student.insertMany(data) 
+        res.status(201).json({
+            success:true,
+            data
+        })
+    }catch(err){
+        console.log(err.message)
+        next(new Error(501,err.message))
+    }
+}
+
+
+//Get courses according to year and semester
+exports.getCourses = async(req,res,next)=>{
+    try{
+        const {year, semester} = req.query
+        const semesterNumber = 2*year-(semester.toLowerCase()==="odd")
+
+        // Get the date 6 months ago
+        const sixMonthsAgo = new Date();
+        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+        const courses = await Course.find({
+                                    semester:semesterNumber,
+                                    createdAt: {
+                                        $gte:sixMonthsAgo
+                                    }
+                                })
+                                .select("_id name category department")
+                                .populate({
+                                    path:"department",
+                                    select:"name"
+                                })
+
+        const departments = await Department.find({})
+        const categories = await Course.distinct("category")
+
+        //Classifying courses according to department and category
+        const classifiedCourses = {}
+		categories.forEach(category=>classifiedCourses[category] = category === 'Core' ? {} : [])
+
+		departments.forEach(department=>classifiedCourses['Core'][department.name]=[])
+
+        courses.forEach(course=>{
+			const category = course.category
+			const department = course.department.name
+			if(category==='Core') 
+				classifiedCourses[category][department].push(course)
+			else
+				classifiedCourses[category].push(course)
+		})
+
+
+        res.status(200).json({
+            success:true,
+            courses:classifiedCourses
+        })
+
+
+    }catch(err){
+        console.log(err.message)
+        next(new Error(500, err.message))
+    }
+}
+
+
+
+//Generate timetable 
+exports.generateTimetable = async(req,res,next)=>{
+    try{
+        const {semester,courses} = req.body
+        const students = await Student.find({semester,status:"active"})
+                        .select("uid courses")
+                        .populate({
+                            path: "courses",
+                            select: "_id name"
+                        })
+        //Finding out the courses taken by the students
+        /*
+=======
 exports.registerStudents = async (req, res, next) => {
 	try {
 		const defaultPassword = req.body.password;
