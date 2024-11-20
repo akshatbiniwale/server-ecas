@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt")
 const sendJWT = require("../services/sendJWT")
 const Course = require("../models/course")
 const Grade = require("../models/grade")
-const { getGradePoint, calculateSGPA } = require("../services/helper")
+const { getGradePoint, calculateSGPA, calculateTotal } = require("../services/helper")
 
 //Login
 exports.loginStudent= async(req,res,next)=>{
@@ -56,12 +56,11 @@ exports.createGradeCard = async(req,res,next)=>{
         const semesterNumber = 2*year-(semester.toLowerCase()==="odd")
         const studentId = req.user
         const student = await Student.findById(studentId)
-        //Filtering current semster courses                                        
-        await student.populate({
-            path:"courses",
-            select:"_id",
-            match:{semester:semesterNumber}
-        })
+                                     .populate({
+                                        path:"courses",
+                                        select:"_id",
+                                        match:{semester:semesterNumber}
+                                    })
         //Getting Ids of courses taken by student for given semester
         const courseIds = student.courses.map(course=>course._id)
         //Finding Grades for each course
@@ -87,15 +86,25 @@ exports.createGradeCard = async(req,res,next)=>{
             }
         })
         if(student.gpa.some(x=>x.semester===semesterNumber) === false){
+            console.log(data["courses"])
             student.gpa.push({
                 semester:semesterNumber,
-                sgpa:calculateSGPA(data["courses"])
+                sgpa: calculateSGPA(data["courses"])
             })
             await student.save()
         }
         data["gpa"] = student.gpa 
+        data["total"] = calculateTotal(data["courses"])
+        data["studentDetails"] = {
+            name:student.name,
+            uid:student.uid,
+            year:year,
+            semester:semester
+        }
+        //Add if student passed or failed
         res.status(200).json({
-            sucess:true
+            sucess:true,
+            res:data
         })
     }catch(err){
         next(new ErrorHandler(501,err))
