@@ -3,11 +3,13 @@ const mongoose = require("mongoose")
 const gradeSchema = new mongoose.Schema({
     student:{
         type:mongoose.Schema.Types.ObjectId,
-        required:[true,"Student ID required"]
+        required:[true,"Student ID required"],
+        ref:"Student"
     },
     course:{
         type:mongoose.Schema.Types.ObjectId,
-        required:[true,"Course ID required"]
+        required:[true,"Course ID required"],
+        ref:"Course"
     },
     saValue:{
         type:Number,

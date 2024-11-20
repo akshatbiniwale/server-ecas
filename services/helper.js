@@ -9,6 +9,21 @@ const gradePoints = {
     "FF":0
 }
 
+exports.calculateTotal = (courses)=>{
+    let totalCredits = 0
+    let earnedCredits = 0
+    let totalCGPA = 0
+    let earnedCGPA = 0
+    courses.forEach(course=>{
+        totalCredits += course.credits
+        earnedCredits += course.creditsEarned
+        totalCGPA += course.credits*10
+        earnedCGPA += course.credits*course.gradePoint
+    })
+    
+    return {totalCredits,earnedCredits,totalCGPA,earnedCGPA}
+}
+
 exports.getGrade = (marks,gradeRanges)=>{
     let _grade = "FF"
     for(const grade in gradeRanges){
@@ -22,13 +37,9 @@ exports.getGradePoint = (grade)=>{
     return gradePoints[grade]
 }
 
-exports.calculateSGPA = (courses)=>{
-    let total = 0
-    let earned = 0
-    courses.forEach(course=>{
-        total += course.credits*10
-        earned += course.creditsEarned*course.gradePoint
-    })
 
-    return (earned*10/total).toFixed(2)
+exports.calculateSGPA = (courses)=>{
+    const {totalCPGA, earnedCPGA} = calculateTotal(courses)
+    return (earnedCPGA*10/totalCPGA).toFixed(2)
 }
+
