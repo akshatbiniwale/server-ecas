@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt")
 const sendJWT = require("../services/sendJWT")
 const Course = require("../models/course")
 const Grade = require("../models/grade")
+const { getGradePoint, calculateSGPA } = require("../services/helper")
 
 //Login
 exports.loginStudent= async(req,res,next)=>{
@@ -51,24 +52,51 @@ exports.getCourses = async(req,res,next)=>{
 //Get grade card 
 exports.createGradeCard = async(req,res,next)=>{
     try{
+        const {semester, year} = req.query
+        const semesterNumber = 2*year-(semester.toLowerCase()==="odd")
         const studentId = req.user
         const student = await Student.findById(studentId)
-                                     .select("semester courses") 
         //Filtering current semster courses                                        
         await student.populate({
             path:"courses",
-            select:"_id name credit code",
-            match:{semester:student.semester}
+            select:"_id",
+            match:{semester:semesterNumber}
         })
+        //Getting Ids of courses taken by student for given semester
         const courseIds = student.courses.map(course=>course._id)
-        //Finding grade in current courses
-        const courseGrades = await Grade.find({student:studentId,course:{$in:courseIds}})
-        /*
-            Implementation of generating grade card
-        */
-       res.status(200).json({
-        sucess:true
-       })
+        //Finding Grades for each course
+        const courseGrades = await Grade.find({
+                                student:studentId,
+                                course:{
+                                    $in:courseIds
+                                }
+                            }).populate({
+                                path:"course",
+                                select:"-faculty"
+                            })
+        //Combining grades and other information
+        const data = {}
+        data["courses"] = courseGrades.map(courseGrade=>{
+            return {
+                name:courseGrade.course.name,
+                code:courseGrade.course.code,
+                credits:courseGrade.course.credits,
+                grade:courseGrade.grade,
+                creditsEarned: (courseGrade.grade === "FF" ? 0 : courseGrade.course.credits),
+                gradePoint: getGradePoint(courseGrade.grade)
+            }
+        })
+        if(student.gpa.some(x=>x.semester===semesterNumber) === false){
+            student.gpa.push({
+                semester:semesterNumber,
+                sgpa:calculateSGPA(data["courses"])
+            })
+            await student.save()
+        }
+        data["gpa"] = student.gpa 
+        res.status(200).json({
+            sucess:true
+        })
     }catch(err){
         next(new ErrorHandler(501,err))
     }

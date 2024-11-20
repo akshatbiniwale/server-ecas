@@ -48,6 +48,12 @@ const studentSchema = new mongoose.Schema({
 		type:String,
 		default:"active"
 	},
+	gpa:[
+		{
+			semester: Number,
+			sgpa:Number
+		}
+	],
 	createdAt:{
 		type:Date,
 		default: new Date(Date.now())

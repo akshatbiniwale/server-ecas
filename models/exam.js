@@ -3,11 +3,7 @@ const mongoose = require("mongoose");
 const examSchema = new mongoose.Schema({
 	// examId: {
 	// 	type: String,
-	// },
-	hallId: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: "ExamHall",
-	},
+	// },,
 	exam_type: {
 		type: String,
 		required: [true, "Exam type required"],
@@ -21,9 +17,10 @@ const examSchema = new mongoose.Schema({
 		type: Date,
 		required: [true, "Date type required"],
 	},
-	weightage: {
-		type: Number,
-	},
+	time:{
+		type:String,
+		required:[true, "Exam time required"]
+	}
 });
 
 const Exam = mongoose.model("Exam", examSchema);
