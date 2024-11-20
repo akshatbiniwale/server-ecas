@@ -10,7 +10,7 @@ const authenticate = (req,res,next)=>{
         req.user = id
         next()
     }catch(err){
-        next(new ErrorHandler())
+        next(new ErrorHandler(401, "Failed to authenticate"))
     }
 }
 

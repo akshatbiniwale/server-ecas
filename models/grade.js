@@ -18,11 +18,12 @@ const gradeSchema = new mongoose.Schema({
         required:[true,"Score required"]
     },
     grade:{
-        type:Number,
+        type:String,
         required:[true,"Grade required"]
     },
     status:{
         type:String,
+        default:"Pass"
     },
     createdAt:{
         type:Date,

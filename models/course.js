@@ -40,6 +40,48 @@ const courseSchema = new mongoose.Schema({
 		ref: "Department",
 		required: [true, "Department Required"],
 	},
+	theory:{
+		ise1:{
+			weightage:{
+				type:Number,
+				default:0.5
+			},
+			marks:{
+				type:Number,
+				default:20
+			}
+		},
+		ise2:{
+			weightage:{
+				type:Number,
+				default:0.5
+			},
+			marks:{
+				type:Number,
+				default:20
+			}
+		},
+		mse:{
+			weightage:{
+				type:Number,
+				default:0.2
+			},
+			marks:{
+				type:Number,
+				default:30
+			}
+		},
+		ese:{
+			weightage:{
+				type:Number,
+				default:0.7
+			},
+			marks:{
+				type:Number,
+				default:100
+			}
+		}
+	},
 	createdAt:{
 		type:Date,
 		default:new Date(Date.now())
