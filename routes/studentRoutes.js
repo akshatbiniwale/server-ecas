@@ -1,5 +1,5 @@
 const express = require("express");
-const { registerStudent, loginStudent, getCourses, createGradeCard } = require("../controller/student");
+const { registerStudent, loginStudent, getCourses, createGradeCard, getTimetable, getCourseMarks } = require("../controller/student");
 const authenticate = require("../middleware/authGuard");
 const router = express.Router();
 
@@ -10,5 +10,11 @@ router.get("/courses", authenticate, getCourses)
 
 //Get grade card
 router.get("/result", authenticate, createGradeCard)
+
+//Get timetable
+router.get("/timetable", authenticate, getTimetable)
+
+//Get course marks
+router.get("/course/marks", authenticate, getCourseMarks)
 
 module.exports = router

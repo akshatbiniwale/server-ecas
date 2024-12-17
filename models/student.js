@@ -60,10 +60,10 @@ const studentSchema = new mongoose.Schema({
 	}
 });
 
-studentSchema.pre("save", async function(){
-	const hashedPassword = await bcrypt.hash(this.password,10)
-	this.password = hashedPassword
-})
+// studentSchema.pre("save", async function(){
+// 	const hashedPassword = await bcrypt.hash(this.password,10)
+// 	this.password = hashedPassword
+// })
 
 const Student = mongoose.model("Student", studentSchema);
 

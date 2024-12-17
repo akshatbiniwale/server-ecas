@@ -189,6 +189,7 @@ exports.generateTimetable = async(req,res,next)=>{
         formData.append("rooms", JSON.stringify(rooms))
         formData.append("startDate",startDate)
         formData.append("startTime",startTime)
+		formData.append("semester",semesterNumber)
 
 		const data = await axios.post(
 			"http://127.0.0.1:8000/generate_timetable",

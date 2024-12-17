@@ -137,7 +137,7 @@ exports.scheduleExam = async (req,res,next)=>{
 //Updating marks of students using csv uploaded by teacher (This csv contains all marks of all exams i.e ISE,MSE,ESE)
 exports.uploadExamMarks = async (req,res,next)=>{
     try{
-        const {courseId} = req.body
+        const {course} = req.body
         //read csv data
         const data = await readCSV(req.file.path)
         const promises = data.map(async(details)=>{
@@ -146,7 +146,7 @@ exports.uploadExamMarks = async (req,res,next)=>{
             const studentId = await Student.findOne({uid}).select("_id")
             return await Mark.create({
                 student:studentId._id,
-                course:courseId,
+                course:course,
                 ise1,
                 ise2,
                 mse,
@@ -169,8 +169,14 @@ exports.calculateSA = async(req,res,next)=>{
        
         const {course} = req.query 
         const courseDetails = await Course.findById(course)  //To extract weightage details
-        const marks = await Mark.find({course}).select("ese")
-        const finalMarks = marks.map(x=>x.ese)
+        const marks = await Mark.find({course})
+        console.log(courseDetails)
+        const finalMarks = marks.map(x=>{
+            return(
+                courseDetails.theory.ise1.weightage*x.ise1+courseDetails.theory.ise2.weightage*x.ise2+
+                courseDetails.theory.mse.weightage*x.mse+courseDetails.theory.ese.weightage*x.ese
+            )
+        })
         /*
             Add procedure for calculating final marks i.e ise+mse+ese according to weightage
         */

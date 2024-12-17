@@ -39,7 +39,7 @@ exports.getGradePoint = (grade)=>{
 
 
 exports.calculateSGPA = (courses)=>{
-    const {totalCPGA, earnedCPGA} = calculateTotal(courses)
-    return (earnedCPGA*10/totalCPGA).toFixed(2)
+    const {totalCGPA, earnedCGPA} = exports.calculateTotal(courses)
+    return (earnedCGPA*10/totalCGPA).toFixed(2)
 }
 

@@ -1,11 +1,15 @@
 const Department = require("../models/department")
 const Student = require("../models/student")
+const Mark = require("../models/mark")
 const ErrorHandler = require("../services/ErrorHandler")
 const bcrypt = require("bcrypt")
 const sendJWT = require("../services/sendJWT")
 const Course = require("../models/course")
 const Grade = require("../models/grade")
 const { getGradePoint, calculateSGPA, calculateTotal } = require("../services/helper")
+const axios = require("axios")
+const readCSV = require("../services/readCSV")
+
 
 //Login
 exports.loginStudent= async(req,res,next)=>{
@@ -29,13 +33,14 @@ exports.loginStudent= async(req,res,next)=>{
 //Get student course
 exports.getCourses = async(req,res,next)=>{
     try{
-        const {semester} = req.query
-        console.log(semester)
+        const query = {}
+        if(req.query?.semester)
+            query["semester"] = semester
         const student = await Student.findById(req.user)
                                      .select("courses")
                                      .populate({
                                         path:"courses",
-                                        match:{semester:semester}
+                                        match:query
                                      })
         res.status(200)
         .json({
@@ -86,7 +91,7 @@ exports.createGradeCard = async(req,res,next)=>{
             }
         })
         if(student.gpa.some(x=>x.semester===semesterNumber) === false){
-            console.log(data["courses"])
+            // console.log(data["courses"])
             student.gpa.push({
                 semester:semesterNumber,
                 sgpa: calculateSGPA(data["courses"])
@@ -107,9 +112,77 @@ exports.createGradeCard = async(req,res,next)=>{
             res:data
         })
     }catch(err){
+        console.log(err)
         next(new ErrorHandler(501,err))
     }
 }
+
+
+//Get timetable
+exports.getTimetable = async(req,res,next)=>{
+    try{
+        const {semester,year} = req.query 
+        const semesterNumber = 2*year-(semester.toLowerCase()==="odd")
+        const {data} = await axios({
+            url: `http://127.0.0.1:8000/get_timetable?semester=${semesterNumber}&year=${2024}`, // Flask server URL  Year is hardcoded for now
+            method: 'GET',
+        })
+        const timetable = JSON.parse(data.timetable)
+        const processedData = []
+        timetable.forEach(x=>{
+            const date = x.date
+            Object.values(x).forEach(x=>{
+                if(x && x!==date){
+                    processedData.push({
+                        name:x,
+                        date:date.split(" ")[0],
+                        time:date.split(" ")[1]
+                    })
+                }
+            })
+        })
+        res.status(200).json({
+            success:true,
+            timetable:processedData
+        })
+    }catch(err){
+        console.log(err)
+        next(new ErrorHandler(501, err))
+    }
+}
+
+
+exports.getCourseMarks = async(req,res,next)=>{
+    try{
+        const {course} = req.query
+        const courseMarks = await Mark.find({course})
+                                  .populate({
+                                    path:"student",
+                                    select:"department",
+                                    populate:{
+                                        path:"department"
+                                    }
+                                  })
+        const marks = courseMarks.map(marks=>{
+            return {
+                branch:marks.student.department.name,
+                ise1:marks.ise1,
+                ise2:marks.ise2,
+                mse:marks.mse,
+                ese:marks.ese
+            }
+        })
+        res.status(200).json({
+            success:true,
+            marks
+        })
+    }catch(err){
+        console.log(err)
+        next(new ErrorHandler(501, err))
+    }
+}
+
+
 
 //Apply for Re-Exam
 exports.applyForReExam = async(req,res,next)=>{
