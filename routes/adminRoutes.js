@@ -8,11 +8,14 @@ const {
 	registerAutoRooms,
 	registerManualRooms,
 	getRooms,
-	getCourses
-} = require("../controller/admin");
+	getCourses,
+	registerAdmin,
+} = require("../controllers/admin");
 
 const upload = require("../middleware/multer");
 const router = express.Router();
+
+router.post("/register", registerAdmin);
 
 router.post("/department", createDepartment);
 router.post("/course", upload.single("file"), createCourse);

@@ -11,7 +11,59 @@ const jsonToCsv = require("../services/jsonToCsv");
 const readCSV = require("../services/readCSV");
 const ExamHall = require("../models/examHall");
 
-exports.register = async (req, res, next) => {};
+const Admin = require("../models/admin");
+
+exports.registerAdmin = async (req, res, next) => {
+	try {
+		const { name, email, id, address, phoneNumber, password } = req.body;
+
+		console.log(name, email, id, address, phoneNumber, password);
+
+		// Basic validation
+		if (!name || !email || !id || !address || !phoneNumber || !password) {
+			return res
+				.status(400)
+				.json({ success: false, message: "All fields are required." });
+		}
+
+		// Check if admin already exists
+		const existingAdmin = await Admin.findOne({ email });
+		if (existingAdmin) {
+			return res
+				.status(409)
+				.json({
+					success: false,
+					message: "Admin already exists with this email.",
+				});
+		}
+
+		const newAdmin = await Admin.create({
+			name,
+			email,
+			id,
+			address,
+			phoneNumber,
+			password,
+		});
+
+		res.status(201).json({
+			success: true,
+			admin: {
+				_id: newAdmin._id,
+				name: newAdmin.name,
+				email: newAdmin.email,
+				id: newAdmin.id,
+				address: newAdmin.address,
+				phoneNumber: newAdmin.phoneNumber,
+				token: await newAdmin.generateJWT(),
+			},
+			message: "Admin registered successfully.",
+		});
+	} catch (err) {
+		console.log(err.message);
+		next(new ErrorHandler(500, err.message));
+	}
+};
 
 //Create department
 exports.createDepartment = async (req, res, next) => {
